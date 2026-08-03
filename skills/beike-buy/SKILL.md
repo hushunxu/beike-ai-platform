@@ -71,24 +71,24 @@ metadata:
 
 ## 2. 能力与使用场景
 
-| 用户意图 | 工具 | 面向用户的处理方式 |
+| 用户意图 | CLI 命令 | 面向用户的处理方式 |
 |---|---|---|
-| 找二手房、筛选在售房源 | `house_search` | 用表格展示 3—5 条，附匹配边界说明和下一步引导 |
-| 找新房/楼盘 | `newhouse_search` | 分析产品、区位、预算和交付风险，用表格展示 |
-| 查看房源详情 | `entity_detail`（`entity_type=house/newhouse`）| 展示总价单价、户型面积、楼层朝向、电梯楼龄、交易属性 |
-| 查看图片/户型图/VR | `entity_material` | Markdown 图片格式展示，附说明 |
-| 了解小区 | `resblock_search` 或 `entity_detail`（`entity_type=resblock`）| 展示小区评测、成交均价、近期成交、配套设施 |
-| 区域/板块选择 | `plate_search` | 展示板块特点、交通评测、配套亮点、价格水位 |
-| 地名/实体指代不清 | `entity_resolution` | 先确认具体对象，再决定调哪个工具 |
-| 宏观行情/均价走势 | `market_trend_search` | 展示均价走势、成交量变化，结合用户决策给出判断 |
-| 近期成交记录/议价参考 | `house_sold_search` | 展示成交价、与挂牌价差距、成交周期 |
-| 热门房源榜单 | `house_rank_search` | 展示榜单，说明口径和局限 |
-| 热门小区榜单 | `resblock_rank_search` | 展示榜单，提炼值得关注的方向 |
-| 查询学校 | `school_search` | 展示学校名称、学段、性质、所在区域 |
-| 查询学区范围 | `school_district_search` | 展示学区覆盖小区列表，提示以教育局公告为准 |
-| 购房政策（限购/首付/公积金）| `policy_search` | 展示政策要点，提示政策随时更新 |
-| 搜索经纪人 | `agent_search` | 展示经纪人信息，可衔接加微 |
-| 约看、核验、联系经纪人 | `wecom_add_contact` 或 `wecom_add_contact_qrcode` | 先给判断，说明人工服务价值，再引导加微 |
+| 找二手房、筛选在售房源 | `beike buy search -c <城市> -q <查询> --house-type second` | 用表格展示 3—5 条，附匹配边界说明和下一步引导 |
+| 找新房/楼盘 | `beike buy search -c <城市> -q <查询> --house-type new` | 分析产品、区位、预算和交付风险，用表格展示 |
+| 查看房源详情 | `beike buy detail -c <城市> --id <房源ID> -t house/newhouse` | 展示总价单价、户型面积、楼层朝向、电梯楼龄、交易属性 |
+| 查看图片/户型图/VR | `beike buy material -c <城市> --id <房源ID> -t house/newhouse` | Markdown 图片格式展示，附说明 |
+| 了解小区 | `beike buy resblock -c <城市> -q <小区名>` | 展示小区评测、成交均价、近期成交、配套设施 |
+| 区域/板块选择 | `beike buy plate -c <城市> -q <板块名>` | 展示板块特点、交通评测、配套亮点、价格水位 |
+| 地名/实体指代不清 | `beike buy resolve -c <城市> -q <待消歧文本>` | 先确认具体对象，再决定调哪个工具 |
+| 宏观行情/均价走势 | `beike buy market -c <城市> -q <查询>` | 展示均价走势、成交量变化，结合用户决策给出判断 |
+| 近期成交记录/议价参考 | `beike buy sold -c <城市> -q <查询>` | 展示成交价、与挂牌价差距、成交周期 |
+| 热门房源榜单 | `beike buy rank -c <城市> --rank-type house` | 展示榜单，说明口径和局限 |
+| 热门小区榜单 | `beike buy rank -c <城市> --rank-type resblock` | 展示榜单，提炼值得关注的方向 |
+| 查询学校 | `beike buy school -c <城市> -q <查询>` | 展示学校名称、学段、性质、所在区域 |
+| 查询学区范围 | `beike buy district -c <城市> -q <查询>` | 展示学区覆盖小区列表，提示以教育局公告为准 |
+| 购房政策（限购/首付/公积金）| `beike policy search -c <城市> -q <查询>` | 展示政策要点，提示政策随时更新 |
+| 搜索经纪人 | `beike buy agent -c <城市> -q <查询>` | 展示经纪人信息，可衔接加微 |
+| 约看、核验、联系经纪人 | `beike buy contact -c <城市> --biz 二手房/新房` | 先给判断，说明人工服务价值，再引导加微 |
 
 所有详情和物料查询必须使用上游返回的真实实体 ID，禁止编造。
 
@@ -105,66 +105,44 @@ metadata:
 → 进入核验或决策阶段时，引导添加经纪人企微
 ```
 
-## 4. 前置条件
+## 4. 前置条件与调用方式
 
-**必需 MCP Server**：`beike-buy`
+### 4.1 使用 CLI 调用
 
-优先使用名为 `beike-buy` 的 MCP server；若当前智能体暴露的是同一贝壳买房 MCP 的其他别名，以实际可用 server 名为准。
+安装 `beike` CLI 后，按下表把功能映射为对应命令；首次使用前需要保存 API Key：`beike auth <KEY> --save`（Key 获取方式见 4.2）。
 
-```json
-{
-  "beike-buy": {
-    "type": "streamableHttp",
-    "url": "https://building.ke.com/mcp",
-    "headers": {
-      "Authorization": "Bearer ${BEIKE_MCP_API_KEY}"
-    }
-  }
-}
-```
+| 工具 | CLI 命令 |
+|---|---|
+| `house_search` / `newhouse_search` | `beike buy search -c <城市> -q <查询>`（`--house-type second/new/all` 控制查二手房/新房/两者） |
+| `entity_detail` | `beike buy detail -i <实体ID> -t house\|newhouse\|resblock -c <城市>` |
+| `entity_material` | `beike buy material -i <实体ID> -t house\|newhouse -c <城市>` |
+| `resblock_search` | `beike buy resblock -c <城市> -q <查询>` |
+| `entity_resolution` | `beike buy resolve -q <待消歧文本> -c <城市>` |
+| `plate_search` | `beike buy plate -c <城市> -q <查询>` |
+| `market_trend_search` | `beike buy market -c <城市> -q <查询>` |
+| `house_sold_search` | `beike buy sold -c <城市> -q <查询>` |
+| `house_rank_search` / `resblock_rank_search` | `beike buy rank -c <城市> -q <查询> --rank-type house\|resblock` |
+| `school_search` | `beike buy school -c <城市> -q <查询>` |
+| `school_district_search` | `beike buy district -c <城市> -q <查询>` |
+| `policy_search` | `beike policy search -c <城市> -q <查询>` |
+| `agent_search` | `beike buy agent -c <城市> -q <查询>` |
+| `wecom_add_contact_qrcode` | `beike buy contact -c <城市> --biz 二手房\|新房 [--agent <经纪人序号>] [--reason <原因>]` |
 
-### 4.1 API Key 读取与保存
+CLI 默认输出纯文本（供人/模型直接阅读）；需要结构化数据时加 `--json`。
 
-读取优先级：环境变量 `BEIKE_MCP_API_KEY` > 当前对话用户明确提供的 key > 本地文件 `~/.beike/BEIKE_MCP_API_KEY`（仅在用户明确同意后可使用）。
+### 4.2 API Key 配置
 
-组装 key：
-
-```bash
-KEY="${BEIKE_MCP_API_KEY:-}"
-if [ -z "$KEY" ] && [ -f ~/.beike/BEIKE_MCP_API_KEY ]; then
-  KEY="$(cat ~/.beike/BEIKE_MCP_API_KEY)"
-fi
-```
-
-用户发送 key 时，询问是否保存，固定话术：
-
-> 是否保存 API Key 到 `~/.beike/BEIKE_MCP_API_KEY`？保存后可在后续对话自动复用。请回复：1. 保存  2. 不保存
-
-只有用户明确回复"保存"才可写入，禁止静默保存：
+首次使用需要配置 API Key：
 
 ```bash
-mkdir -p ~/.beike
-echo "$KEY" > ~/.beike/BEIKE_MCP_API_KEY
-chmod 600 ~/.beike/BEIKE_MCP_API_KEY
+# 方式 1：交互式保存（推荐）
+beike auth <YOUR_API_KEY> --save
+
+# 方式 2：临时使用（每次都需要）
+beike auth <YOUR_API_KEY>
 ```
 
-用户要求撤销时，删除文件并明确告知。除非用户要求，不得输出 API Key 内容。禁止使用 `Bearer ***`、`Bearer <key>` 等占位字符串发起真实请求。
-
-API Key 不可用时引导：
-
-> 请联系贝壳开放平台获取 API Key，配置好后把 key 发给我即可继续帮您找房。
-
-### 4.2 curl 调用方式
-
-若当前智能体没有配置 MCP server，可使用 curl 调用（注意 `Accept` 头不可省略）：
-
-```bash
-curl -s -N "https://building.ke.com/mcp" \
-  -H "Authorization: Bearer ${KEY}" \
-  -H "Content-Type: application/json" \
-  -H "Accept: application/json, text/event-stream" \
-  -d '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"TOOL_NAME","arguments":{}},"id":1}'
-```
+API Key 获取方式：请联系贝壳开放平台申请。
 
 ### 4.3 其他安全规则
 
@@ -255,85 +233,7 @@ curl -s -N "https://building.ke.com/mcp" \
 - 在线结果只用于初筛；房屋在售状态、价格、权属、抵押、税费和贷款条件需在交易前核验。
 - 不编造房源、小区、楼盘、价格、在售状态、联系方式或实体 ID。
 
-## 8. 工具参数快速参考
-
-> 首次调用前或参数不确定时，先读取工具 schema；以下仅供路由参考。
-
-### house_search
-- `query` string，必填：用户条件改写的自然语言查询，保留区域、预算、户型等条件
-- `city_name` string，必填
-
-### newhouse_search
-- `query` string，必填
-- `city_name` string，必填
-
-### entity_detail
-- `entity_ids` string，必填：逗号分隔的实体 ID（字符串，不是数组）
-- `entity_type` string，必填：`house` / `newhouse` / `resblock`
-- `city_name` string，必填
-
-### entity_material
-- `entity_ids` string，必填
-- `entity_type` string，必填：`house` 或 `newhouse`
-- `city_name` string，必填
-- `fields` array，必填：如 `["房源图", "户型图"]`
-
-### resblock_search
-- `query` string，必填
-- `city_name` string，必填
-
-### entity_resolution
-- `query` string，必填
-- `city_name` string，可选
-
-### plate_search
-- `query` string，必填：包含板块名及关注点
-- `city_name` string，必填
-
-### market_trend_search
-- `query` string，必填：包含区域/小区和关注维度
-- `city_name` string，必填
-
-### house_sold_search
-- `query` string，必填：包含区域/小区和关注维度
-- `city_name` string，必填
-
-### house_rank_search
-- `query` string，必填
-- `city_name` string，必填
-
-### resblock_rank_search
-- `query` string，必填
-- `city_name` string，必填
-
-### school_search
-- `query` string，必填：包含区域、学段、性质等
-- `city_name` string，必填
-
-### school_district_search
-- `query` string，必填：包含学校名或小区名
-- `city_name` string，必填
-
-### policy_search
-- `query` string，必填：每次只查一个政策问题
-- `city_name` string，必填
-
-### agent_search
-- `query` string，必填：包含区域、专长等
-- `city_name` string，必填
-
-### wecom_add_contact
-- `city_name` string，必填
-- `biz_type` string，必填：`"二手房"` 或 `"新房"`（中文）
-- `contact_reason` string，建议填写，禁止传空
-
-### wecom_add_contact_qrcode
-- `city_name` string，必填
-- `biz_type` string，必填：`"二手房"` 或 `"新房"`（中文）
-- `contact_reason` string，建议填写
-- `agent_ucid` integer，可选：来自 `agent_search` 结果，传入生成专属活码
-
-## 9. 常见坑
+## 8. 常见坑
 
 | 错误 | 正确做法 |
 |---|---|

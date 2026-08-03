@@ -71,13 +71,13 @@ metadata:
 
 ## 2. 能力与使用场景
 
-| 用户意图 | 工具 | 面向用户的处理方式 |
+| 用户意图 | CLI 命令 | 面向用户的处理方式 |
 |---|---|---|
-| 查学校、学校基本情况或区域学校 | `school_search` | 给出教育资源方向、适用边界和下一步筛选建议 |
-| 查学区、划片、对口或入学范围 | `school_district_search` | 解释当前参考关系，同时强调年份和资格风险 |
-| 学校/小区/学区名称不清 | `entity_resolution` | 先消歧，禁止根据相似名称猜测 |
-| 追问学校或小区详情 | `entity_detail` | 围绕用户决策点解释，不做字段搬运 |
-| 核验具体年份、入学条件或购房承接 | `wecom_add_contact_qrcode` | 先说明风险和核验价值，再引导加微 |
+| 查学校、学校基本情况或区域学校 | `beike buy school -c <城市> -q <查询>` | 给出教育资源方向、适用边界和下一步筛选建议 |
+| 查学区、划片、对口或入学范围 | `beike buy district -c <城市> -q <查询>` | 解释当前参考关系，同时强调年份和资格风险 |
+| 学校/小区/学区名称不清 | `beike buy resolve -c <城市> -q <待消歧文本>` | 先消歧，禁止根据相似名称猜测 |
+| 追问小区详情 | `beike buy resblock -c <城市> -q <小区名称>` | 围绕用户决策点解释，不做字段搬运 |
+| 核验具体年份、入学条件或购房承接 | `beike buy contact -c <城市> --biz 二手房 --reason <咨询内容>` | 先说明风险和核验价值，再引导加微 |
 
 所有详情查询必须使用上游返回的真实实体 ID，禁止编造。
 
@@ -93,11 +93,24 @@ metadata:
 → 涉及具体资格、年份或购房决策时，引导添加经纪人企微核验
 ```
 
-## 4. 前置条件
+## 4. 前置条件与调用方式
 
-**必需 MCP Server**：`beike-buy`（学区工具与买房 MCP 共用同一服务）
+### 4.1 CLI 调用方式
 
-### 4.1 API Key 读取与保存
+已安装 `beike` CLI 时，按下表把工具映射为对应命令；首次使用前需要保存 Key：`beike auth <KEY> --save`（Key 获取方式见 4.2）。
+
+| 工具 | CLI 命令 |
+|---|---|
+| `school_search` | `beike buy school -c <城市> -q <查询>` |
+| `school_district_search` | `beike buy district -c <城市> -q <查询>` |
+| `entity_resolution` | `beike buy resolve -q <待消歧文本> -c <城市>` |
+| `entity_detail` | `beike buy detail -i <实体ID> -t <实体类型> -c <城市>` |
+| `wecom_add_contact_qrcode` | `beike buy contact -c <城市> --biz 二手房\|新房 [--agent <序号>]` |
+
+CLI 默认输出纯文本；需要结构化数据时加 `--json`。
+
+
+### 4.2 API Key 读取与保存
 
 读取优先级：环境变量 `BEIKE_MCP_API_KEY` > 当前对话用户明确提供的 key > 本地文件 `~/.beike/BEIKE_MCP_API_KEY`。
 
@@ -114,7 +127,7 @@ fi
 
 只有用户明确回复"保存"才可写入，禁止静默保存。用户要求撤销时删除文件并告知。禁止使用占位字符串发起真实请求。
 
-### 4.2 其他安全规则
+### 4.3 其他安全规则
 
 - 首次调用工具前或参数不确定时，先读取工具 schema；本文参数只是快速参考。
 - 工具调用过程仅内部执行，禁止向用户展示工具名、调用命令、参数或原始 JSON。
@@ -218,31 +231,38 @@ fi
 - 不输出工具名、原始 JSON 或内部调用过程。
 - 不编造学校、划片、对口关系、招生条件或实体 ID。
 
-## 9. 工具参数快速参考
+## 9. CLI 命令快速参考
 
-> 首次调用前或参数不确定时，先读取工具 schema。
+### 学校查询
 
-### school_search
-- `query` string，必填：包含区域、学段、性质等，如"西城区 重点小学"
-- `city_name` string，必填
+**查询学校**
+```bash
+beike buy school -c 北京 -q 西城区重点小学
+beike buy school -c 北京 -q 朝阳区国际学校
+```
 
-### school_district_search
-- `query` string，必填：包含学校名或小区名，如"德胜门小学 学区范围"
-- `city_name` string，必填
+**查询学区划片**
+```bash
+beike buy district -c 北京 -q 德胜门小学学区范围
+beike buy district -c 北京 -q 和平里小区对口学校
+```
 
-### entity_resolution
-- `query` string，必填：需要消歧的文本
-- `city_name` string，可选
+**消歧学校/小区名称**
+```bash
+beike buy resolve -c 北京 -q 望京实验小学
+```
 
-### entity_detail
-- `entity_ids` string，必填：逗号分隔的实体 ID
-- `entity_type` string，必填：`resblock` 等
-- `city_name` string，必填
+**查看小区学区房信息**
+```bash
+beike buy resblock -c 北京 -q 和平里学区房小区
+```
 
-### wecom_add_contact_qrcode
-- `city_name` string，必填
-- `biz_type` string，必填：`"二手房"` 或 `"新房"`
-- `contact_reason` string，建议填写，禁止传空
+### 联系经纪人
+
+**获取经纪人咨询（学区房购买）**
+```bash
+beike buy contact -c 北京 --biz 二手房 --reason "咨询学区房购买和入学风险"
+```
 
 ## 10. 常见坑
 

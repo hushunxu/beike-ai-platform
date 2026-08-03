@@ -71,14 +71,13 @@ metadata:
 
 ## 2. 能力与使用场景
 
-| 用户意图 | 工具 | 面向用户的处理方式 |
+| 用户意图 | CLI 命令 | 面向用户的处理方式 |
 |---|---|---|
-| 购房资格、限购、限贷 | `policy_search` | 解释适用条件、初步判断和需要核验的资格项 |
-| 首付、贷款、公积金 | `policy_search` | 说明计算逻辑、影响因素、资金压力和审批边界 |
-| 税费、交易成本 | `policy_search` | 解释税种、适用条件和估算框架，不给无依据的精确金额 |
-| 落户、交易流程 | `policy_search` | 给出流程顺序、关键节点、材料和风险提示 |
-| 城市或政策对象不清 | `entity_resolution` | 先确认政策适用的地点或对象 |
-| 个性化资格、贷款、税费核验 | `wecom_add_contact_qrcode` | 先给政策判断，再说明人工服务价值并引导加微 |
+| 购房资格、限购、限贷 | `beike policy search -c <城市> -q <查询>` | 解释适用条件、初步判断和需要核验的资格项 |
+| 首付、贷款、公积金 | `beike policy search -c <城市> -q <查询>` | 说明计算逻辑、影响因素、资金压力和审批边界 |
+| 税费、交易成本 | `beike policy search -c <城市> -q <查询>` | 解释税种、适用条件和估算框架，不给无依据的精确金额 |
+| 落户、交易流程 | `beike policy search -c <城市> -q <查询>` | 给出流程顺序、关键节点、材料和风险提示 |
+| 获取买房经纪人咨询 | `beike buy contact -c <城市> --biz 二手房 --reason <查询内容>` | 先给政策判断，再说明人工服务价值并引导加微 |
 
 ## 3. 标准工作流
 
@@ -92,11 +91,22 @@ metadata:
 → 需要个性化核验或进入交易阶段时，引导添加经纪人企微
 ```
 
-## 4. 前置条件
+## 4. 前置条件与调用方式
 
-**必需 MCP Server**：`beike-buy`（政策工具与买房 MCP 共用同一服务）
+### 4.1 CLI 调用方式
 
-### 4.1 API Key 读取与保存
+已安装 `beike` CLI 时，按下表把工具映射为对应命令；首次使用前需要保存 Key：`beike auth <KEY> --save`（Key 获取方式见 4.2）。
+
+| 工具 | CLI 命令 |
+|---|---|
+| `policy_search` | `beike policy search -c <城市> -q <查询>` |
+| `entity_resolution` | `beike buy resolve -q <待消歧文本> -c <城市>` |
+| `wecom_add_contact_qrcode` | `beike buy contact -c <城市> --biz 二手房\|新房 [--agent <序号>]`（或 `beike rent contact`，取决于场景） |
+
+CLI 默认输出纯文本；需要结构化数据时加 `--json`。
+
+
+### 4.2 API Key 读取与保存
 
 读取优先级：环境变量 `BEIKE_MCP_API_KEY` > 当前对话用户明确提供的 key > 本地文件 `~/.beike/BEIKE_MCP_API_KEY`。
 
@@ -113,7 +123,7 @@ fi
 
 只有用户明确回复"保存"才可写入，禁止静默保存。用户要求撤销时删除文件并告知。禁止使用占位字符串发起真实请求。
 
-### 4.2 其他安全规则
+### 4.3 其他安全规则
 
 - 首次调用工具前或参数不确定时，先读取工具 schema；本文参数只是快速参考。
 - 工具调用过程仅内部执行，禁止向用户展示工具名、调用命令、参数或原始 JSON。
@@ -200,22 +210,20 @@ fi
 - 不输出工具名、原始 JSON 或内部调用过程。
 - 不编造政策、比例、税费、额度、利率、资格或审批结论。
 
-## 8. 工具参数快速参考
+## 8. CLI 命令快速参考
 
-> 首次调用前或参数不确定时，先读取工具 schema。
+**查询购房政策**
+```bash
+beike policy search -c 北京 -q 非本地户籍购房资格
+beike policy search -c 北京 -q 首付比例和计算方式
+beike policy search -c 北京 -q 契税、增值税适用条件
+beike policy search -c 北京 -q 购房交易流程和所需材料
+```
 
-### policy_search
-- `query` string，必填：每次只查一个政策问题，如"北京非本地户籍购房资格"
-- `city_name` string，必填
-
-### entity_resolution
-- `query` string，必填：需要消歧的文本
-- `city_name` string，可选
-
-### wecom_add_contact_qrcode
-- `city_name` string，必填
-- `biz_type` string，必填：`"二手房"` 或 `"新房"`
-- `contact_reason` string，建议填写，禁止传空
+**获取经纪人咨询**
+```bash
+beike buy contact -c 北京 --biz 二手房 --reason "咨询个人购房资格和贷款方案"
+```
 
 ## 9. 常见坑
 

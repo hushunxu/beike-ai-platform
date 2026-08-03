@@ -82,15 +82,15 @@ metadata:
 
 ## 2. 能力与使用场景
 
-| 用户意图 | 工具 | 面向用户的处理方式 |
+| 用户意图 | CLI 命令 | 面向用户的处理方式 |
 |---|---|---|
-| 房价趋势、涨跌、热度、挂牌量、成交量 | `market_trend_search` | 给出市场温度、依据、对买卖决策的影响 |
-| 近期成交记录、成交价、议价参考 | `house_sold_search` | 展示成交价、与挂牌价差距、成交周期；说明可比性限制 |
-| 板块/商圈特点与价格水位 | `plate_search` | 给出板块判断、交通配套、价格分布 |
-| 租金走势、空置周期、出租效率、租售关系 | `rent_market_search` | 给出租赁市场判断、出租难度、对持有决策的影响 |
-| 小区/楼盘/地名指代不清 | `entity_resolution` | 先消歧，确认对象后再继续查询 |
-| 追问具体小区/房源详情 | `entity_detail` | 围绕用户决策点补充产品和位置因素 |
-| 需要核验议价/成交/持有方案 | `wecom_add_contact_qrcode` | 先给行情判断，说明人工服务价值，再引导加微 |
+| 房价趋势、涨跌、热度、挂牌量、成交量 | `beike buy market -c <城市> -q <查询>` 或 `beike rent market -c <城市> -q <查询>` | 给出市场温度、依据、对买卖决策的影响 |
+| 近期成交记录、成交价、议价参考 | `beike buy sold -c <城市> -q <查询>` | 展示成交价、与挂牌价差距、成交周期；说明可比性限制 |
+| 板块/商圈特点与价格水位 | `beike buy plate -c <城市> -q <查询>` 或 `beike rent plate -c <城市> -q <查询>` | 给出板块判断、交通配套、价格分布 |
+| 租金走势、空置周期、出租效率、租售关系 | `beike rent market -c <城市> -q <查询>` | 给出租赁市场判断、出租难度、对持有决策的影响 |
+| 小区/楼盘/地名指代不清 | `beike buy resolve -c <城市> -q <待消歧文本>` 或 `beike rent resolve -c <城市> -q <待消歧文本>` | 先消歧，确认对象后再继续查询 |
+| 追问具体小区/房源详情 | `beike buy detail -c <城市> -t resblock --id <实体ID>` 或 `beike rent resblock -c <城市> -q <查询>` | 围绕用户决策点补充产品和位置因素 |
+| 需要核验议价/成交/持有方案 | `beike buy contact -c <城市> --biz 二手房` 或 `beike rent contact -c <城市> --biz 租房` | 先给行情判断，说明人工服务价值，再引导加微 |
 
 所有详情查询必须使用上游返回的真实实体 ID，禁止编造。
 
@@ -106,11 +106,26 @@ metadata:
 → 需要进一步核验时，引导添加经纪人企微
 ```
 
-## 4. 前置条件
+## 4. 前置条件与调用方式
 
-**必需 MCP Server**：`beike-buy`（行情工具与买房 MCP 共用同一服务）
+### 4.1 CLI 调用方式
 
-### 4.1 API Key 读取与保存
+已安装 `beike` CLI 时，按下表把工具映射为对应命令；首次使用前需要保存 Key：`beike auth <KEY> --save`（Key 获取方式见 4.2）。
+
+| 工具 | CLI 命令 |
+|---|---|
+| `market_trend_search` | `beike buy market -c <城市> -q <查询>` |
+| `house_sold_search` | `beike buy sold -c <城市> -q <查询>` |
+| `plate_search` | `beike buy plate -c <城市> -q <查询>`（或 `beike rent plate`，同一工具） |
+| `rent_market_search` | `beike rent market -c <城市> -q <查询>` |
+| `entity_resolution` | `beike buy resolve -q <待消歧文本> -c <城市>` |
+| `entity_detail` | `beike buy detail -i <实体ID> -t <实体类型> -c <城市>`（或 `beike rent detail`，取决于场景） |
+| `wecom_add_contact_qrcode` | `beike buy contact -c <城市> --biz 二手房\|新房 [--agent <序号>]`（或 `beike rent contact`） |
+
+CLI 默认输出纯文本；需要结构化数据时加 `--json`。
+
+
+### 4.2 API Key 读取与保存
 
 读取优先级：环境变量 `BEIKE_MCP_API_KEY` > 当前对话用户明确提供的 key > 本地文件 `~/.beike/BEIKE_MCP_API_KEY`。
 
@@ -127,7 +142,7 @@ fi
 
 只有用户明确回复"保存"才可写入，禁止静默保存。用户要求撤销时删除文件并告知。禁止使用占位字符串发起真实请求。
 
-### 4.2 其他安全规则
+### 4.3 其他安全规则
 
 - 首次调用工具前或参数不确定时，先读取工具 schema；本文参数只是快速参考。
 - 工具调用过程仅内部执行，禁止向用户展示工具名、调用命令、参数或原始 JSON。
@@ -204,39 +219,55 @@ fi
 - 不输出工具名、原始 JSON 或内部调用过程。
 - 不编造成交价、涨跌幅、租金或议价结论。
 
-## 8. 工具参数快速参考
+## 8. CLI 命令快速参考
 
-> 首次调用前或参数不确定时，先读取工具 schema。
+### 买房行情查询
 
-### market_trend_search
-- `query` string，必填：包含区域/小区和关注维度，如"望京板块二手房价格走势"
-- `city_name` string，必填
+**房价趋势、涨跌**
+```bash
+beike buy market -c 北京 -q 望京板块二手房价格走势
+beike buy market -c 北京 -q 朝阳区新房行情
+```
 
-### house_sold_search
-- `query` string，必填：包含区域/小区和关注维度，如"望京两居室近半年成交价"
-- `city_name` string，必填
+**成交记录、议价参考**
+```bash
+beike buy sold -c 北京 -q 望京两居室近半年成交价
+```
 
-### plate_search
-- `query` string，必填：包含板块名及关注点
-- `city_name` string，必填
+**板块/商圈特点**
+```bash
+beike buy plate -c 北京 -q 望京
+```
 
-### rent_market_search
-- `query` string，必填：包含区域/小区和关注维度，如"望京租金走势"
-- `city_name` string，必填
+**消歧地名/实体**
+```bash
+beike buy resolve -c 北京 -q 望京SOHO
+```
 
-### entity_resolution
-- `query` string，必填：需要消歧的文本
-- `city_name` string，可选
+### 租赁行情查询
 
-### entity_detail
-- `entity_ids` string，必填：逗号分隔的实体 ID
-- `entity_type` string，必填：`house` / `resblock` 等
-- `city_name` string，必填
+**租金走势、出租效率**
+```bash
+beike rent market -c 北京 -q 望京租金走势
+beike rent market -c 北京 -q 朝阳区一居出租效率
+```
 
-### wecom_add_contact_qrcode
-- `city_name` string，必填
-- `biz_type` string，必填：`"二手房"` 或 `"新房"`
-- `contact_reason` string，建议填写，禁止传空
+**板块/商圈特点**
+```bash
+beike rent plate -c 北京 -q 望京交通方便
+```
+
+### 加微经纪人
+
+**获取买房经纪人二维码**
+```bash
+beike buy contact -c 北京 --biz 二手房 --reason "咨询议价空间"
+```
+
+**获取租房经纪人二维码**
+```bash
+beike rent contact -c 北京 --biz 租房 --reason "咨询合适房源"
+```
 
 ## 9. 常见坑
 
