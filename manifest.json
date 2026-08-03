@@ -1,0 +1,29 @@
+{
+  "latest": "0.2.2",
+  "releases": [
+    {
+      "version": "0.2.2",
+      "released_at": "2026-08-03T14:30:00Z",
+      "binaries": [
+        {
+          "os": "darwin",
+          "arch": "arm64",
+          "url": "https://github.com/hushunxu/beike-cli-releases/releases/download/v0.2.2/beike-darwin-arm64-0.2.2.tar.gz",
+          "sha256": "cbd452033d850ac8c363b29025bf88b8ec0140d49efe0c2c386f0424baba288d"
+        },
+        {
+          "os": "darwin",
+          "arch": "amd64",
+          "url": "https://github.com/hushunxu/beike-cli-releases/releases/download/v0.2.2/beike-darwin-x64-0.2.2.tar.gz",
+          "sha256": "7b288c35d6ca5abb2bb6ed020822ff5748f20f4f0b24ef8e8b3c9428fef6fbac"
+        },
+        {
+          "os": "linux",
+          "arch": "amd64",
+          "url": "https://github.com/hushunxu/beike-cli-releases/releases/download/v0.2.2/beike-linux-x64-0.2.2.tar.gz",
+          "sha256": "0741e43e993523033e72640aaaf0bb55ea5637909279b6b62cfcd6097e1d5805"
+        }
+      ]
+    }
+  ]
+}
