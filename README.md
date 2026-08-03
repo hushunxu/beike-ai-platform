@@ -1,47 +1,43 @@
 # Beike AI Platform
 
-贝壳 AI 开放平台发布仓库，包含 CLI 工具、Skills 定义、API 文档和使用示例。
-
-## 📦 内容
-
-- **dist/** - CLI 工具的编译产物和 NPM 包
-- **skills/** - Skill 定义（从 beike-skill 项目同步）
-  - beike-buy - 二手房购买助手
-  - beike-rent - 租房助手
-  - beike-market - 市场行情查询
-  - beike-policy - 购房政策顾问
-  - beike-school - 学区查询
+贝壳 AI 开放平台，为开发者提供房产信息查询、市场分析等 AI 能力。
 
 ## 🚀 快速开始
 
-### 安装 CLI
+选择适合你的方式：
 
-```bash
-npm install -g @ke/beike-skill
+### 1️⃣ 使用 CLI 工具
+
+命令行方式查询房产信息。
+
+👉 [CLI 安装和使用指南](./cli/README.md)
+
+### 2️⃣ 集成 AI Skills
+
+在你的 AI Agent 中使用房产专业知识能力。
+
+👉 [Skills 安装和文档](./skills/README.md)
+
+### 3️⃣ 获取 API Key
+
+所有方式都需要 API Key 进行认证。
+
+👉 [API Key 管理](./docs/authentication.md)
+
+## 📂 项目结构
+
 ```
-
-### 保存 API Key
-
-```bash
-beike auth <YOUR_API_KEY> --save
+.
+├── cli/              # CLI 工具和发布脚本
+│   ├── releases/     # 安装脚本和版本清单
+│   └── README.md     # CLI 文档
+├── skills/           # AI Skills 定义
+│   ├── dist/         # 打包的 Skill 压缩包
+│   ├── install.sh    # Skills 安装脚本
+│   └── README.md     # Skills 文档
+└── docs/             # 平台文档
+    └── authentication.md  # API Key 管理
 ```
-
-### 使用示例
-
-```bash
-# 查询二手房
-beike buy search -c 北京 -q "朝阳区 1000万以内"
-
-# 查询租房
-beike rent search -c 北京 -q "望京 2000元以内"
-
-# 查询学区
-beike buy school -c 北京 -q "西城区重点小学"
-```
-
-## 📖 文档
-
-详细文档请查看 [skills/README.md](./skills/README.md)
 
 ## 📝 许可
 

@@ -1,6 +1,6 @@
-# 贝壳 CLI Skills
+# 贝壳 AI Skill 定义
 
-贝壳地产 CLI 工具的 Skill 定义集合，为用户提供买房、租房、市场行情、政策咨询、学区查询等专业顾问服务。
+贝壳 AI 开放平台的 Skill（能力模块）定义集合，为 AI Agent 提供买房、租房、市场行情、政策咨询、学区查询等专业顾问服务。
 
 ## 包含的 Skills
 
@@ -14,45 +14,25 @@
 
 ## 快速开始
 
-### 安装 beike CLI
+### 安装全部 Skills
 
 ```bash
-npm install -g @ke/beike-skill
+curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/install.sh | bash
 ```
 
-### 保存 API Key
-
-首次使用前需要保存 API Key：
+### 安装指定 Skills
 
 ```bash
-beike auth <YOUR_API_KEY> --save
+# 安装单个或多个 skill
+curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/install.sh | bash -s -- beike-buy beike-rent
+
+# 安装列表
+curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/install.sh | bash -s -- beike-buy beike-market beike-policy
 ```
 
-API Key 将保存到 `~/.beike/BEIKE_MCP_API_KEY`，后续自动使用。
+Skills 默认安装到 `~/.claude/skills/<skill-name>/`。
 
-### 使用示例
-
-**查询二手房**
-```bash
-beike buy search -c 北京 -q "朝阳区 1000万以内 2居"
-```
-
-**查询租房**
-```bash
-beike rent search -c 北京 -q "望京 2000元以内 1居"
-```
-
-**查询学区**
-```bash
-beike buy school -c 北京 -q "西城区重点小学"
-```
-
-**查询购房政策**
-```bash
-beike policy search -c 北京 -q "非本地户籍购房资格"
-```
-
-## 文档
+## 详细文档
 
 详细使用指南请查看各 Skill 的文档：
 
@@ -61,30 +41,6 @@ beike policy search -c 北京 -q "非本地户籍购房资格"
 - [beike-market - 市场行情查询](./beike-market/SKILL.md)
 - [beike-policy - 购房政策顾问](./beike-policy/SKILL.md)
 - [beike-school - 学区查询](./beike-school/SKILL.md)
-
-## 命令结构
-
-每个 Skill 对应一组 CLI 子命令：
-
-```
-beike <skill>
-  buy       - 二手房和新房购买
-  rent      - 租房
-  market    - 市场行情
-  policy    - 购房政策
-  school    - 学区查询
-```
-
-## 常见问题
-
-**Q: API Key 在哪里获取？**
-A: 联系贝壳销售或技术支持获取 API Key。
-
-**Q: 支持哪些城市？**
-A: 支持全国主要城市，具体可通过 `beike buy search -c <城市>` 验证。
-
-**Q: 如何重置 API Key？**
-A: 运行 `beike auth <NEW_KEY> --save` 覆盖已保存的 Key。
 
 ## 许可
 
