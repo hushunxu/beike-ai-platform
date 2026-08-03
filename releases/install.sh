@@ -6,8 +6,8 @@ if [ -z "${BASH_VERSION:-}" ]; then
 fi
 set -uo pipefail
 
-BEIKE_BASE_URL="${BEIKE_RELEASE_URL:-https://github.com/hushunxu/beike-cli-releases/releases/download}"
-MANIFEST_URL="${BEIKE_MANIFEST_URL:-https://raw.githubusercontent.com/hushunxu/beike-cli-releases/main/releases/manifest.json}"
+BEIKE_BASE_URL="${BEIKE_RELEASE_URL:-https://github.com/hushunxu/beike-ai-platform/releases/download}"
+MANIFEST_URL="${BEIKE_MANIFEST_URL:-https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/cli/releases/manifest.json}"
 FORCE=1
 
 usage() {

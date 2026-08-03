@@ -1,6 +1,6 @@
-# Beike CLI Releases
+# Beike AI Platform
 
-贝壳 CLI 工具的发布版本，包含 CLI 可执行文件、NPM 包、以及相关的 Skill 定义。
+贝壳 AI 开放平台发布仓库，包含 CLI 工具、Skills 定义、API 文档和使用示例。
 
 ## 📦 内容
 

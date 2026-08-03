@@ -8,19 +8,19 @@
         {
           "os": "darwin",
           "arch": "arm64",
-          "url": "https://github.com/hushunxu/beike-cli-releases/releases/download/v0.2.2/beike-darwin-arm64-0.2.2.tar.gz",
+          "url": "https://github.com/hushunxu/beike-ai-platform/releases/download/v0.2.2/beike-darwin-arm64-0.2.2.tar.gz",
           "sha256": "8b26735240d7b17204a25e68c2046e7262b241cffe5dafb5d336ecd5f11a9ed8"
         },
         {
           "os": "darwin",
           "arch": "amd64",
-          "url": "https://github.com/hushunxu/beike-cli-releases/releases/download/v0.2.2/beike-darwin-x64-0.2.2.tar.gz",
+          "url": "https://github.com/hushunxu/beike-ai-platform/releases/download/v0.2.2/beike-darwin-x64-0.2.2.tar.gz",
           "sha256": "7b288c35d6ca5abb2bb6ed020822ff5748f20f4f0b24ef8e8b3c9428fef6fbac"
         },
         {
           "os": "linux",
           "arch": "amd64",
-          "url": "https://github.com/hushunxu/beike-cli-releases/releases/download/v0.2.2/beike-linux-x64-0.2.2.tar.gz",
+          "url": "https://github.com/hushunxu/beike-ai-platform/releases/download/v0.2.2/beike-linux-x64-0.2.2.tar.gz",
           "sha256": "0741e43e993523033e72640aaaf0bb55ea5637909279b6b62cfcd6097e1d5805"
         }
       ]
