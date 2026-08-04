@@ -62,6 +62,8 @@ detect_skills_dir() {
         printf '%s/.claude/skills\n' "$HOME"
     elif [[ -n "${OPENCLAW_HOME:-}" ]]; then
         printf '%s/skills\n' "${OPENCLAW_HOME%/}"
+    elif [[ -n "${HERMES_HOME:-}" ]]; then
+        printf '%s/skills\n' "${HERMES_HOME%/}"
     elif [[ "$PWD" == "$HOME/WorkBuddy" || "$PWD" == "$HOME/WorkBuddy/"* ]]; then
         printf '%s/.workbuddy/skills\n' "$HOME"
     elif [[ -d "$HOME/.workbuddy" ]]; then
@@ -72,6 +74,8 @@ detect_skills_dir() {
         printf '%s/.codex/skills\n' "$HOME"
     elif [[ -d "$HOME/.openclaw" ]]; then
         printf '%s/.openclaw/skills\n' "$HOME"
+    elif [[ -d "$HOME/.hermes" ]]; then
+        printf '%s/.hermes/skills\n' "$HOME"
     else
         printf '%s/.agents/skills\n' "$HOME"
     fi

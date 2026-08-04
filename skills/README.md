@@ -30,7 +30,7 @@ curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/ski
 curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/install.sh | bash -s -- beike-buy beike-market beike-policy
 ```
 
-安装器会自动识别当前宿主的用户级 Skill 目录：WorkBuddy 使用 `~/.workbuddy/skills/`，Claude Code 使用 `~/.claude/skills/`，Codex 使用 `~/.codex/skills/`，OpenClaw 使用 `~/.openclaw/skills/`；无法识别时回退到通用目录 `~/.agents/skills/`。
+安装器会自动识别当前宿主的用户级 Skill 目录：WorkBuddy 使用 `~/.workbuddy/skills/`，Claude Code 使用 `~/.claude/skills/`，Codex 使用 `~/.codex/skills/`，OpenClaw 使用 `~/.openclaw/skills/`，Hermes 使用 `${HERMES_HOME:-~/.hermes}/skills/`；无法识别时回退到通用目录 `~/.agents/skills/`。
 
 也可以通过 `--skills-dir` 或环境变量 `BEIKE_SKILLS_DIR` 指定目录：
 
