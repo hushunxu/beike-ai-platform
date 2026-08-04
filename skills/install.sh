@@ -148,10 +148,18 @@ EOF
         echo "  版本: $version"
 
         # 检查本地是否已安装
-        local skill_dir="$BEIKE_SKILLS_DIR/$skill_name"
-        if [[ -f "$skill_dir/manifest.json" ]]; then
+        local skill_install_dir="$BEIKE_SKILLS_DIR/$skill_name"
+        if [[ -f "$skill_install_dir/manifest.json" ]]; then
             local local_version
-            local_version=$(python3 -c "import json; print(json.load(open('$skill_dir/manifest.json')).get('version', 'unknown'))" 2>/dev/null || echo "unknown")
+            local_version=$(python3 <<PYSCRIPT
+import json
+try:
+    with open('$skill_install_dir/manifest.json') as f:
+        print(json.load(f).get('version', 'unknown'))
+except:
+    print('unknown')
+PYSCRIPT
+)
             if [[ "$local_version" == "$version" ]]; then
                 echo "  ℹ 已是最新版本（$local_version），跳过"
                 continue
