@@ -9,8 +9,11 @@ if [ -z "${BASH_VERSION:-}" ]; then
 fi
 set -uo pipefail
 
-BEIKE_SKILLS_DIR="${BEIKE_SKILLS_DIR:-$HOME/.claude/skills}"
+SKILLS_DIR_EXPLICIT="${BEIKE_SKILLS_DIR:-}"
+BEIKE_SKILLS_DIR=""
 MANIFEST_URL="${BEIKE_MANIFEST_URL:-https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/manifest.json}"
+CLI_INSTALL_URL="${BEIKE_CLI_INSTALL_URL:-https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/cli/releases/install.sh}"
+SKIP_CLI=0
 
 usage() {
     cat <<EOF >&2
@@ -22,6 +25,9 @@ usage() {
 
 选项:
   <skill-name>  指定要安装的 skill（支持多个），默认安装全部
+  --skills-dir <目录>
+                安装到指定目录；优先级高于自动识别
+  --no-cli      只安装 Skills，不安装其依赖的 beike CLI
   -h, --help    显示帮助
 EOF
 }
@@ -30,10 +36,48 @@ requested_skills=()
 while [[ $# -gt 0 ]]; do
     case "$1" in
     -h | --help) usage; exit 0 ;;
+    --skills-dir)
+        if [[ $# -lt 2 || -z "$2" ]]; then
+            echo "Error: --skills-dir 需要目录参数" >&2
+            usage
+            exit 1
+        fi
+        SKILLS_DIR_EXPLICIT="$2"
+        shift 2
+        ;;
+    --no-cli) SKIP_CLI=1; shift ;;
     -*) echo "Error: 未知参数 $1" >&2; usage; exit 1 ;;
     *) requested_skills+=("$1"); shift ;;
     esac
 done
+
+detect_skills_dir() {
+    if [[ -n "$SKILLS_DIR_EXPLICIT" ]]; then
+        printf '%s\n' "$SKILLS_DIR_EXPLICIT"
+    elif [[ -n "${WORKBUDDY_HOME:-}" ]]; then
+        printf '%s/skills\n' "${WORKBUDDY_HOME%/}"
+    elif [[ -n "${CODEX_THREAD_ID:-}" ]]; then
+        printf '%s/.codex/skills\n' "$HOME"
+    elif [[ -n "${CLAUDE_CODE:-}${CLAUDECODE:-}" ]]; then
+        printf '%s/.claude/skills\n' "$HOME"
+    elif [[ -n "${OPENCLAW_HOME:-}" ]]; then
+        printf '%s/skills\n' "${OPENCLAW_HOME%/}"
+    elif [[ "$PWD" == "$HOME/WorkBuddy" || "$PWD" == "$HOME/WorkBuddy/"* ]]; then
+        printf '%s/.workbuddy/skills\n' "$HOME"
+    elif [[ -d "$HOME/.workbuddy" ]]; then
+        printf '%s/.workbuddy/skills\n' "$HOME"
+    elif [[ -d "$HOME/.claude" ]]; then
+        printf '%s/.claude/skills\n' "$HOME"
+    elif [[ -d "$HOME/.codex" ]]; then
+        printf '%s/.codex/skills\n' "$HOME"
+    elif [[ -d "$HOME/.openclaw" ]]; then
+        printf '%s/.openclaw/skills\n' "$HOME"
+    else
+        printf '%s/.agents/skills\n' "$HOME"
+    fi
+}
+
+BEIKE_SKILLS_DIR="$(detect_skills_dir)"
 
 require_cmd() {
     if ! command -v "$1" >/dev/null 2>&1; then
@@ -80,6 +124,30 @@ cleanup() {
     [[ -n "$TMP_DIR" && -d "$TMP_DIR" ]] && rm -rf "$TMP_DIR" 2>/dev/null || true
 }
 
+install_cli() {
+    if command -v beike >/dev/null 2>&1; then
+        echo "✓ 已检测到 beike CLI，跳过安装"
+        return
+    fi
+
+    if [[ "$SKIP_CLI" -eq 1 ]]; then
+        echo "ℹ 已跳过 beike CLI 安装（--no-cli）"
+        return
+    fi
+
+    echo "==> 未检测到 beike CLI，正在安装必要依赖..."
+    local cli_installer="$TMP_DIR/install-beike-cli.sh"
+    if ! download "$CLI_INSTALL_URL" "$cli_installer"; then
+        fatal_error "无法下载 beike CLI 安装脚本" "URL: $CLI_INSTALL_URL"
+    fi
+    if ! bash "$cli_installer" --no-force; then
+        fatal_error "beike CLI 安装失败"
+    fi
+    if ! command -v beike >/dev/null 2>&1; then
+        fatal_error "beike CLI 安装完成，但当前 PATH 中未找到 beike" "请重新打开终端后执行 beike --version"
+    fi
+}
+
 main() {
     TMP_DIR="$(mktemp -d -t beike-skills-install.XXXXXX)"
     trap cleanup EXIT INT TERM
@@ -113,6 +181,7 @@ except Exception as e:
     fi
 
     echo "==> 计划安装: ${requested_skills[*]}"
+    echo "==> Skill 安装目录: $BEIKE_SKILLS_DIR"
     echo ""
 
     mkdir -p "$BEIKE_SKILLS_DIR"
@@ -213,6 +282,9 @@ with open('$skill_dir/manifest.json') as f:
         echo ""
     done
 
+    install_cli
+    echo ""
+
     echo "=== 安装完成 ==="
     echo "✓ 已安装以下 Skills:"
     for skill_name in "${requested_skills[@]}"; do
@@ -225,7 +297,17 @@ with open('$skill_dir/manifest.json') as f:
     echo ""
     echo "位置: $BEIKE_SKILLS_DIR"
     echo ""
-    echo "💡 在 Claude 等 AI 工具中提问时，首次使用会自动提示配置 API Key。"
+    if [[ -n "${BEIKE_MCP_API_KEY:-}" || -s "$HOME/.beike/BEIKE_MCP_API_KEY" ]]; then
+        echo "✓ 已检测到 API Key，可以开始使用"
+    else
+        echo "下一步：登录贝壳 AI 开放平台获取 API Key"
+        echo "  http://preview-skill.ke.com/?action=get-key"
+        if command -v beike >/dev/null 2>&1; then
+            echo ""
+            echo "获取后保存："
+            echo "  beike auth <YOUR_API_KEY> --save"
+        fi
+    fi
 }
 
 main "$@"

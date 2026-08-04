@@ -185,7 +185,11 @@ main() {
     echo "运行以下命令开始使用："
     echo "  beike --help"
     echo ""
-    echo "💡 首次使用时需要 API Key，会自动提示获取。"
+    echo "下一步：登录贝壳 AI 开放平台获取 API Key"
+    echo "  http://preview-skill.ke.com/?action=get-key"
+    echo ""
+    echo "获取后保存："
+    echo "  beike auth <YOUR_API_KEY> --save"
 }
 
 main "$@"

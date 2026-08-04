@@ -35,15 +35,18 @@ beike buy search -c 北京 -q "朝阳区"
 ### 🤖 Skills（AI Agent）
 
 ```bash
-# 安装全部
+# 安装全部（自动安装共用的 beike CLI）
 
 curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/install.sh | bash
 
 # 或只装特定 Skill
 curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/install.sh | bash -s -- beike-buy beike-rent
 
-# 配置环境变量
-export BEIKE_MCP_API_KEY=<YOUR_API_KEY>
+# 可选：显式指定宿主的 Skill 目录
+curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/install.sh | bash -s -- --skills-dir "$HOME/.workbuddy/skills" beike-buy
+
+# 保存 API Key
+beike auth <YOUR_API_KEY> --save
 ```
 
 **场景：** 在 Claude/Cursor 中用自然语言提问  

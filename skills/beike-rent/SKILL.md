@@ -20,10 +20,8 @@ keywords:
 packageType: instruction-skill
 instructionOnly: true
 metadata:
-  version: 0.3.5
+  version: 0.3.6
   openclaw:
-    requiredMcp:
-      - beike-rent
     requiresNetwork: true
     dataClassification: real-estate
 ---
@@ -110,9 +108,28 @@ metadata:
 
 ## 4. 前置条件与调用方式
 
-### 4.1 使用 CLI 调用
+### 4.1 CLI 与认证预检
 
-安装 `beike` CLI 后，按下表把功能映射为对应命令；首次使用前需要保存 API Key：`beike auth <KEY> --save`（Key 获取方式见 4.2）。
+每次准备调用真实数据前，按以下顺序处理：
+
+1. 执行 `command -v beike` 检查 CLI，不得根据之前的对话或调用结果猜测它是否存在。
+2. CLI 不存在时，只提供官方安装命令，禁止编造 npm 包名或推荐不存在的 MCP 连接器：
+
+   ```bash
+   curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/cli/releases/install.sh | bash
+   ```
+
+3. CLI 存在时直接执行用户请求。若 CLI 提示 API Key（Bearer Key）缺失、无效、过期或未授权，必须停止查询并引导用户：
+   - 打开 `http://preview-skill.ke.com/?action=get-key` 登录并获取 API Key。
+   - 在本机执行 `beike auth <YOUR_API_KEY> --save`。
+   - 配置完成后重试用户刚才的请求，无需重新收集租房条件。
+4. 不得要求用户在聊天中发送 API Key，不得输出或记录 Key 内容。
+
+认证问题不属于服务异常。只有 CLI 已存在且认证有效，查询仍失败时，才按服务异常处理。
+
+### 4.2 使用 CLI 调用
+
+安装 `beike` CLI 后，按下表把功能映射为对应命令；首次使用前需要保存 API Key：`beike auth <KEY> --save`（Key 获取方式见 4.3）。
 
 | 工具 | CLI 命令 |
 |---|---|
@@ -130,7 +147,7 @@ metadata:
 
 CLI 默认输出纯文本；需要结构化数据时加 `--json`。
 
-### 4.2 API Key 配置
+### 4.3 API Key 配置
 
 首次使用需要配置 API Key：
 
@@ -142,12 +159,12 @@ beike auth <YOUR_API_KEY> --save
 beike auth <YOUR_API_KEY>
 ```
 
-API Key 获取方式：请联系贝壳开放平台申请。
+API Key 获取方式：打开 `http://preview-skill.ke.com/?action=get-key` 登录获取。
 
-### 4.3 其他安全规则
+### 4.4 其他安全规则
 
 - 首次调用某工具前，或参数不确定时，先读取工具 descriptor/schema；本文参数只是快速参考，实际以 schema 为准。
-- 工具调用过程仅内部执行，禁止向用户展示工具名、调用命令、请求参数、原始 JSON/SSE 返回。
+- 工具调用过程仅内部执行，禁止向用户展示工具名、查询命令、请求参数、原始 JSON/SSE 返回；4.1 的安装与认证恢复命令除外。
 
 ## 5. 决策阶段与服务策略
 

@@ -2,7 +2,7 @@
 
 ## 获取 API Key
 
-联系贝壳销售或技术支持获取 API Key。
+打开 [贝壳 AI 开放平台](http://preview-skill.ke.com/?action=get-key) 登录并获取 API Key。
 
 ## 保存 API Key
 
@@ -16,11 +16,13 @@ API Key 将保存到 `~/.beike/BEIKE_MCP_API_KEY`，后续自动使用。
 
 ### Skills 用户
 
-Skills 安装后，在 Claude 中配置环境变量或通过脚本传入 API Key：
+Skills 安装器会自动安装 `beike` CLI。获取 API Key 后保存：
 
 ```bash
-export BEIKE_MCP_API_KEY=<YOUR_API_KEY>
+beike auth <YOUR_API_KEY> --save
 ```
+
+如果只安装 Skill 定义、不希望自动安装 CLI，可给安装命令增加 `--no-cli`。安装器会自动识别 WorkBuddy、Claude Code、Codex 和 OpenClaw 的 Skill 目录，也可使用 `--skills-dir <目录>` 显式指定。
 
 ## 重置 API Key
 
