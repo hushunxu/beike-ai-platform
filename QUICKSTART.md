@@ -6,7 +6,7 @@
 
 所有功能都需要 API Key。
 
-**打开浏览器获取：** https://dev-skill.ke.com/?action=get-key
+**打开浏览器获取：** https://preview-skill.ke.com/?action=get-key
 
 👉 [详细说明](./docs/authentication.md)
 
