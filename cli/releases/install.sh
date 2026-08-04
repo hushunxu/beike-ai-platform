@@ -179,7 +179,38 @@ main() {
     fi
 
     echo ""
-    echo "安装完成！运行 beike --help 查看帮助。"
+    echo "=== 安装完成 ==="
+    echo "✓ beike CLI $version 已安装"
+    echo ""
+    echo "下一步：获取 API Key"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+    # 检查是否已保存 API Key
+    if [[ -f "$HOME/.beike/BEIKE_MCP_API_KEY" ]] && [[ -s "$HOME/.beike/BEIKE_MCP_API_KEY" ]]; then
+        echo "✓ 已检测到保存的 API Key"
+        echo "运行 beike --help 开始使用"
+    else
+        echo "❌ 未找到 API Key"
+        echo ""
+        echo "方式 1️⃣  网页获取（推荐）"
+        echo "  打开浏览器访问并授权："
+        if command -v open >/dev/null 2>&1; then
+            echo "  开始打开浏览器..."
+            open "https://preview-skill.ke.com/?action=get-key"
+        elif command -v xdg-open >/dev/null 2>&1; then
+            echo "  开始打开浏览器..."
+            xdg-open "https://preview-skill.ke.com/?action=get-key"
+        else
+            echo "  https://preview-skill.ke.com/?action=get-key"
+        fi
+        echo ""
+        echo "方式 2️⃣  命令行保存"
+        echo "  获取 Key 后，运行："
+        echo "  beike auth <YOUR_API_KEY> --save"
+        echo ""
+        echo "更多说明："
+        echo "  https://github.com/hushunxu/beike-ai-platform/blob/main/cli/README.md"
+    fi
 }
 
 main "$@"

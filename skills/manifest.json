@@ -1,0 +1,45 @@
+{
+  "latest": "0.3.0",
+  "skills": [
+    {
+      "name": "beike-buy",
+      "displayName": "贝壳买房助手",
+      "version": "0.3.0",
+      "archiveName": "beike-buy-skill",
+      "url": "https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/dist/beike-buy-skill-0.3.0.zip",
+      "sha256": "3c79b40768fcbe5c117129566c7901a7eff14bf7adac9325d45af69789f99afc"
+    },
+    {
+      "name": "beike-market",
+      "displayName": "贝壳行情顾问",
+      "version": "0.1.0",
+      "archiveName": "beike-market-skill",
+      "url": "https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/dist/beike-market-skill-0.1.0.zip",
+      "sha256": "81c79b86aaceb14e2e94744451cb88c785497136ee3f39f153c8eb53143b7dda"
+    },
+    {
+      "name": "beike-policy",
+      "displayName": "贝壳政策顾问",
+      "version": "0.1.0",
+      "archiveName": "beike-policy-skill",
+      "url": "https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/dist/beike-policy-skill-0.1.0.zip",
+      "sha256": "39fad9e8e99f00ef05422f2b7bbf818e83ed52ca4d3aa3a1d3ddbffbe57add3a"
+    },
+    {
+      "name": "beike-rent",
+      "displayName": "贝壳租房助手",
+      "version": "0.3.5",
+      "archiveName": "beike-rent-skill",
+      "url": "https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/dist/beike-rent-skill-0.3.5.zip",
+      "sha256": "c13dfe2b8ea4e2fb9be3ba5d4fef2ef41256bc2d88fa7118e48162404020df10"
+    },
+    {
+      "name": "beike-school",
+      "displayName": "贝壳学区顾问",
+      "version": "0.1.0",
+      "archiveName": "beike-school-skill",
+      "url": "https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/dist/beike-school-skill-0.1.0.zip",
+      "sha256": "03a1249275a88d977bdcc8641c8b16bd70f04637948f2df9700945b24a775d73"
+    }
+  ]
+}

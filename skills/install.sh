@@ -186,7 +186,7 @@ PYSCRIPT
     done
 
     echo "=== 安装完成 ==="
-    echo "已安装的 Skills:"
+    echo "✓ 已安装以下 Skills:"
     for skill_name in "${requested_skills[@]}"; do
         skill_dir="$BEIKE_SKILLS_DIR/$skill_name"
         if [[ -f "$skill_dir/manifest.json" ]]; then
@@ -195,7 +195,25 @@ PYSCRIPT
         fi
     done
     echo ""
-    echo "Skills 位置: $BEIKE_SKILLS_DIR"
+    echo "下一步：获取 API Key"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "在 AI 工具中使用 Skills 需要配置 API Key。"
+    echo ""
+    echo "📱 打开浏览器获取凭证："
+    if command -v open >/dev/null 2>&1; then
+        echo "  开始打开浏览器..."
+        open "https://preview-skill.ke.com/?action=get-key"
+    elif command -v xdg-open >/dev/null 2>&1; then
+        echo "  开始打开浏览器..."
+        xdg-open "https://preview-skill.ke.com/?action=get-key"
+    else
+        echo "  https://preview-skill.ke.com/?action=get-key"
+    fi
+    echo ""
+    echo "📚 完整文档："
+    echo "  https://github.com/hushunxu/beike-ai-platform/blob/main/skills/README.md"
+    echo ""
+    echo "位置: $BEIKE_SKILLS_DIR"
 }
 
 main "$@"
