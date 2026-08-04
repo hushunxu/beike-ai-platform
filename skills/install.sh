@@ -98,7 +98,13 @@ main() {
     # 如果未指定 skill，则安装全部
     if [[ ${#requested_skills[@]} -eq 0 ]]; then
         echo "==> 未指定 skill，将安装全部"
-        requested_skills=($(python3 -c "import json,sys; m=json.loads('$manifest_json'); print(' '.join([s['name'] for s in m.get('skills', [])]))" 2>/dev/null || echo ""))
+        requested_skills=($(python3 <<PYSCRIPT
+import json
+with open('$manifest_file') as f:
+    m = json.load(f)
+    print(' '.join([s['name'] for s in m.get('skills', [])]))
+PYSCRIPT
+))
         if [[ ${#requested_skills[@]} -eq 0 ]]; then
             fatal_error "无法从 manifest 解析 skill 列表"
         fi
