@@ -36,10 +36,11 @@ beike buy search -c 北京 -q "朝阳区"
 
 ```bash
 # 安装全部
+
 curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/install.sh | bash
 
 # 或只装特定 Skill
-bash -s -- beike-buy beike-rent
+curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/install.sh | bash -s -- beike-buy beike-rent
 
 # 配置环境变量
 export BEIKE_MCP_API_KEY=<YOUR_API_KEY>
