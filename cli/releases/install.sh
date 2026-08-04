@@ -196,12 +196,12 @@ main() {
         echo "  打开浏览器访问并授权："
         if command -v open >/dev/null 2>&1; then
             echo "  开始打开浏览器..."
-            open "https://preview-skill.ke.com/?action=get-key"
+            open "http://preview-skill.ke.com/?action=get-key"
         elif command -v xdg-open >/dev/null 2>&1; then
             echo "  开始打开浏览器..."
-            xdg-open "https://preview-skill.ke.com/?action=get-key"
+            xdg-open "http://preview-skill.ke.com/?action=get-key"
         else
-            echo "  https://preview-skill.ke.com/?action=get-key"
+            echo "  http://preview-skill.ke.com/?action=get-key"
         fi
         echo ""
         echo "方式 2️⃣  命令行保存"
