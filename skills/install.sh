@@ -85,6 +85,7 @@ main() {
     trap cleanup EXIT INT TERM
 
     require_cmd tar
+    require_cmd python3
 
     echo "==> 获取 Skill 清单..."
     local manifest_file="$TMP_DIR/manifest.json"
@@ -92,21 +93,22 @@ main() {
         fatal_error "无法下载 manifest" "URL: $MANIFEST_URL"
     fi
 
-    local manifest_json
-    manifest_json="$(cat "$manifest_file")"
-
     # 如果未指定 skill，则安装全部
     if [[ ${#requested_skills[@]} -eq 0 ]]; then
         echo "==> 未指定 skill，将安装全部"
-        requested_skills=($(python3 <<PYSCRIPT
-import json
-with open('$manifest_file') as f:
-    m = json.load(f)
-    print(' '.join([s['name'] for s in m.get('skills', [])]))
-PYSCRIPT
-))
+        requested_skills=($(python3 -c "
+import json, sys
+try:
+    with open('$manifest_file') as f:
+        m = json.load(f)
+        print(' '.join([s['name'] for s in m.get('skills', [])]))
+except Exception as e:
+    print('', file=sys.stderr)
+    sys.exit(1)
+" 2>/dev/null)) || fatal_error "无法解析 manifest"
+
         if [[ ${#requested_skills[@]} -eq 0 ]]; then
-            fatal_error "无法从 manifest 解析 skill 列表"
+            fatal_error "manifest 中没有 skill 或格式错误"
         fi
     fi
 
@@ -119,44 +121,54 @@ PYSCRIPT
     for skill_name in "${requested_skills[@]}"; do
         echo "==> 安装 $skill_name..."
 
-        # 从 manifest 文件中查找该 skill
-        local skill_data_file="$TMP_DIR/$skill_name.data"
-        python3 > "$skill_data_file" <<PYSCRIPT
+        # 从 manifest 中查找该 skill 的信息
+        local url version checksum
+        url=$(python3 -c "
 import json
 with open('$manifest_file') as f:
-    manifest = json.load(f)
-    for s in manifest.get('skills', []):
+    for s in json.load(f).get('skills', []):
         if s.get('name') == '$skill_name':
             print(s.get('url', ''))
-            print(s.get('sha256', ''))
+            break
+" 2>/dev/null) || url=""
+
+        [[ -z "$url" ]] && fatal_error "未找到 Skill: $skill_name"
+
+        version=$(python3 -c "
+import json
+with open('$manifest_file') as f:
+    for s in json.load(f).get('skills', []):
+        if s.get('name') == '$skill_name':
             print(s.get('version', 'unknown'))
-            exit(0)
-print('ERROR')
-print('ERROR')
-print('ERROR')
-PYSCRIPT
+            break
+" 2>/dev/null) || version="unknown"
 
-        local url checksum version
-        read -r url checksum version < "$skill_data_file"
-
-        if [[ "$url" == "ERROR" ]] || [[ -z "$url" ]]; then
-            fatal_error "未找到 Skill: $skill_name 或 manifest 格式错误"
-        fi
+        checksum=$(python3 -c "
+import json
+with open('$manifest_file') as f:
+    for s in json.load(f).get('skills', []):
+        if s.get('name') == '$skill_name':
+            print(s.get('sha256', ''))
+            break
+" 2>/dev/null) || checksum=""
 
         echo "  版本: $version"
 
-        # 检查本地是否已安装
-        local skill_install_dir="$BEIKE_SKILLS_DIR/$skill_name"
-        if [[ -f "$skill_install_dir/manifest.json" ]]; then
+        # 检查本地是否已安装（同版本则跳过）
+        local skill_dir="$BEIKE_SKILLS_DIR/$skill_name"
+        if [[ -f "$skill_dir/manifest.json" ]]; then
             local local_version
-            local_version=$(python3 -c "import json; print(json.load(open('$skill_install_dir/manifest.json')).get('version', 'unknown'))" 2>/dev/null) || local_version="unknown"
-            if [[ -z "$local_version" ]]; then local_version="unknown"; fi
+            local_version=$(python3 -c "
+import json
+with open('$skill_dir/manifest.json') as f:
+    print(json.load(f).get('version', 'unknown'))
+" 2>/dev/null) || local_version="unknown"
 
             if [[ "$local_version" == "$version" ]]; then
-                echo "  ℹ 已是最新版本（$local_version），跳过"
+                echo "  ℹ 已是最新版本，跳过"
                 continue
-            elif [[ "$local_version" != "unknown" ]]; then
-                echo "  ℹ 本地版本 $local_version，准备更新到 $version"
+            else
+                echo "  ℹ 本地版本 $local_version，准备更新"
             fi
         fi
 
@@ -168,7 +180,7 @@ PYSCRIPT
 
         local file_size
         file_size=$(wc -c <"$archive_file" 2>/dev/null || echo "0")
-        [[ "$file_size" -lt 1024 ]] && fatal_error "下载文件过小 ($file_size bytes)，可能已损坏"
+        [[ "$file_size" -lt 1024 ]] && fatal_error "下载文件过小，可能已损坏"
 
         # 校验 sha256
         if [[ -n "$checksum" ]]; then
@@ -180,18 +192,17 @@ PYSCRIPT
                 actual=$(sha256sum "$archive_file" | cut -d' ' -f1)
             fi
             if [[ -n "$actual" && "$actual" != "$checksum" ]]; then
-                fatal_error "校验失败" "期望: $checksum" "实际: $actual"
+                fatal_error "校验失败"
             fi
         fi
 
         echo "  解压中..."
-        local skill_dir="$BEIKE_SKILLS_DIR/$skill_name"
         mkdir -p "$skill_dir"
-        tar -xzf "$archive_file" -C "$skill_dir" || fatal_error "解压 $skill_name 失败"
+        tar -xzf "$archive_file" -C "$skill_dir" || fatal_error "解压失败"
 
         # 检查必需文件
         if [[ ! -f "$skill_dir/$skill_name/SKILL.md" ]]; then
-            fatal_error "压缩包中未找到 $skill_name/SKILL.md"
+            fatal_error "压缩包格式错误（缺少 SKILL.md）"
         fi
 
         # 将文件挪到 skill_dir 根目录
@@ -207,7 +218,7 @@ PYSCRIPT
     for skill_name in "${requested_skills[@]}"; do
         skill_dir="$BEIKE_SKILLS_DIR/$skill_name"
         if [[ -f "$skill_dir/manifest.json" ]]; then
-            version=$(python3 -c "import json; print(json.load(open('$skill_dir/manifest.json')).get('version', 'unknown'))")
+            version=$(python3 -c "import json; print(json.load(open('$skill_dir/manifest.json')).get('version', 'unknown'))" 2>/dev/null || echo "unknown")
             echo "  • $skill_name@$version"
         fi
     done
