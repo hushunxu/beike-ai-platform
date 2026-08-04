@@ -147,6 +147,19 @@ EOF
 
         echo "  版本: $version"
 
+        # 检查本地是否已安装
+        local skill_dir="$BEIKE_SKILLS_DIR/$skill_name"
+        if [[ -f "$skill_dir/manifest.json" ]]; then
+            local local_version
+            local_version=$(python3 -c "import json; print(json.load(open('$skill_dir/manifest.json')).get('version', 'unknown'))" 2>/dev/null || echo "unknown")
+            if [[ "$local_version" == "$version" ]]; then
+                echo "  ℹ 已是最新版本（$local_version），跳过"
+                continue
+            else
+                echo "  ℹ 本地版本 $local_version，准备更新到 $version"
+            fi
+        fi
+
         local archive_file="$TMP_DIR/$skill_name.tar.gz"
         echo "  下载中..."
         if ! download "$url" "$archive_file"; then
@@ -199,25 +212,9 @@ EOF
         fi
     done
     echo ""
-    echo "下一步：获取 API Key"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "在 AI 工具中使用 Skills 需要配置 API Key。"
-    echo ""
-    echo "📱 打开浏览器获取凭证："
-    if command -v open >/dev/null 2>&1; then
-        echo "  开始打开浏览器..."
-        open "http://preview-skill.ke.com/?action=get-key"
-    elif command -v xdg-open >/dev/null 2>&1; then
-        echo "  开始打开浏览器..."
-        xdg-open "http://preview-skill.ke.com/?action=get-key"
-    else
-        echo "  http://preview-skill.ke.com/?action=get-key"
-    fi
-    echo ""
-    echo "📚 完整文档："
-    echo "  https://github.com/hushunxu/beike-ai-platform/blob/main/skills/README.md"
-    echo ""
     echo "位置: $BEIKE_SKILLS_DIR"
+    echo ""
+    echo "💡 在 Claude 等 AI 工具中提问时，首次使用会自动提示配置 API Key。"
 }
 
 main "$@"
