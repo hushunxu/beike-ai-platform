@@ -151,19 +151,13 @@ EOF
         local skill_install_dir="$BEIKE_SKILLS_DIR/$skill_name"
         if [[ -f "$skill_install_dir/manifest.json" ]]; then
             local local_version
-            local_version=$(python3 <<PYSCRIPT
-import json
-try:
-    with open('$skill_install_dir/manifest.json') as f:
-        print(json.load(f).get('version', 'unknown'))
-except:
-    print('unknown')
-PYSCRIPT
-)
+            local_version=$(python3 -c "import json; print(json.load(open('$skill_install_dir/manifest.json')).get('version', 'unknown'))" 2>/dev/null) || local_version="unknown"
+            if [[ -z "$local_version" ]]; then local_version="unknown"; fi
+
             if [[ "$local_version" == "$version" ]]; then
                 echo "  ℹ 已是最新版本（$local_version），跳过"
                 continue
-            else
+            elif [[ "$local_version" != "unknown" ]]; then
                 echo "  ℹ 本地版本 $local_version，准备更新到 $version"
             fi
         fi
