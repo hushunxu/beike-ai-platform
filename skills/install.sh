@@ -119,29 +119,27 @@ PYSCRIPT
     for skill_name in "${requested_skills[@]}"; do
         echo "==> 安装 $skill_name..."
 
-        # 从 manifest 中查找该 skill
-        local entry
-        entry=$(python3 <<PYSCRIPT
+        # 从 manifest 文件中查找该 skill
+        local url checksum version
+        read -r url checksum version <<EOF
+$(python3 <<PYSCRIPT
 import json
-import sys
-manifest = json.loads('''$manifest_json''')
-skills = manifest.get('skills', [])
-for s in skills:
-    if s.get('name') == '$skill_name':
-        print(json.dumps(s))
-        break
+with open('$manifest_file') as f:
+    manifest = json.load(f)
+    skills = manifest.get('skills', [])
+    for s in skills:
+        if s.get('name') == '$skill_name':
+            print(s.get('url', ''))
+            print(s.get('sha256', ''))
+            print(s.get('version', 'unknown'))
+            break
 PYSCRIPT
 )
+EOF
 
-        if [[ -z "$entry" ]]; then
+        if [[ -z "$url" ]]; then
             fatal_error "未找到 Skill: $skill_name" "请检查 skill 名称是否正确"
         fi
-
-        local url checksum
-        url=$(python3 -c "import json; print(json.loads('''$entry''').get('url', ''))")
-        checksum=$(python3 -c "import json; print(json.loads('''$entry''').get('sha256', ''))")
-        local version
-        version=$(python3 -c "import json; print(json.loads('''$entry''').get('version', 'unknown'))")
 
         if [[ -z "$url" ]]; then
             fatal_error "manifest 中 $skill_name 缺少下载地址"
