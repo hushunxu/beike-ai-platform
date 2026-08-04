@@ -120,29 +120,27 @@ PYSCRIPT
         echo "==> 安装 $skill_name..."
 
         # 从 manifest 文件中查找该 skill
-        local url checksum version
-        read -r url checksum version <<EOF
-$(python3 <<PYSCRIPT
+        local skill_data_file="$TMP_DIR/$skill_name.data"
+        python3 > "$skill_data_file" <<PYSCRIPT
 import json
 with open('$manifest_file') as f:
     manifest = json.load(f)
-    skills = manifest.get('skills', [])
-    for s in skills:
+    for s in manifest.get('skills', []):
         if s.get('name') == '$skill_name':
             print(s.get('url', ''))
             print(s.get('sha256', ''))
             print(s.get('version', 'unknown'))
-            break
+            exit(0)
+print('ERROR')
+print('ERROR')
+print('ERROR')
 PYSCRIPT
-)
-EOF
 
-        if [[ -z "$url" ]]; then
-            fatal_error "未找到 Skill: $skill_name" "请检查 skill 名称是否正确"
-        fi
+        local url checksum version
+        read -r url checksum version < "$skill_data_file"
 
-        if [[ -z "$url" ]]; then
-            fatal_error "manifest 中 $skill_name 缺少下载地址"
+        if [[ "$url" == "ERROR" ]] || [[ -z "$url" ]]; then
+            fatal_error "未找到 Skill: $skill_name 或 manifest 格式错误"
         fi
 
         echo "  版本: $version"
