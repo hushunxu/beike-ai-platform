@@ -129,22 +129,32 @@ cleanup() {
 }
 
 install_cli() {
-    if command -v beike >/dev/null 2>&1; then
-        echo "✓ 已检测到 beike CLI，跳过安装"
-        return
-    fi
-
     if [[ "$SKIP_CLI" -eq 1 ]]; then
         echo "ℹ 已跳过 beike CLI 安装（--no-cli）"
         return
     fi
 
-    echo "==> 未检测到 beike CLI，正在安装必要依赖..."
+    local cli_manifest_url="${CLI_INSTALL_URL%install.sh}manifest.json"
+    local remote_version
+    remote_version=$(curl -fsSL "$cli_manifest_url" 2>/dev/null | sed -n 's/.*"latest"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p')
+
+    if command -v beike >/dev/null 2>&1; then
+        local local_version
+        local_version=$(beike --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1)
+        if [[ -n "$remote_version" && "$local_version" == "$remote_version" ]]; then
+            echo "✓ beike CLI 已是最新版本 ($local_version)，跳过"
+            return
+        fi
+        echo "==> 升级 beike CLI $local_version → $remote_version..."
+    else
+        echo "==> 未检测到 beike CLI，正在安装必要依赖..."
+    fi
+
     local cli_installer="$TMP_DIR/install-beike-cli.sh"
     if ! download "$CLI_INSTALL_URL" "$cli_installer"; then
         fatal_error "无法下载 beike CLI 安装脚本" "URL: $CLI_INSTALL_URL"
     fi
-    if ! bash "$cli_installer" --no-force; then
+    if ! bash "$cli_installer"; then
         fatal_error "beike CLI 安装失败"
     fi
     if ! command -v beike >/dev/null 2>&1; then
