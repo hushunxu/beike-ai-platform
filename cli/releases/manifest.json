@@ -21,7 +21,7 @@
           "os": "windows",
           "arch": "amd64",
           "url": "https://github.com/hushunxu/beike-ai-platform/releases/download/v0.2.5/beike-win32-x64-0.2.5.tar.gz",
-          "sha256": "3225e9667a75b7d6c1837831be9be8487940b0eed7405a2115943f4d9b8f7ad0"
+          "sha256": "65b31080dc0be8efb5e52f0758aa491b66fb4ddbf104b90388f05af09d27693e"
         }
       ]
     },
