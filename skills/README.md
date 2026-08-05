@@ -1,6 +1,6 @@
 # 贝壳 AI Skill 定义
 
-贝壳 AI 开放平台的 Skill（能力模块）定义集合，为 AI Agent 提供买房、租房、市场行情、政策咨询、学区查询等专业顾问服务。
+贝壳 AI 开放平台的 Skill（能力模块）定义集合，为 AI Agent 提供买房、租房、卖房、装修、市场行情、政策咨询、学区查询等专业顾问服务。
 
 ## 包含的 Skills
 
@@ -11,6 +11,8 @@
 | **beike-market** | 市场行情和成交数据查询，支持买卖行情、历史成交、租赁行情分析 |
 | **beike-policy** | 购房政策顾问，支持购房资格、首付贷款、税费、交易流程咨询 |
 | **beike-school** | 学区和学校查询，支持学校信息、学区划片、学区房选择建议 |
+| **beike-sell** | 卖房业主助手，支持查询名下挂牌房源、带看记录和调价动态 |
+| **beike-decor** | 装修助手，支持查询装修门店和套餐报价 |
 
 ## 快速开始
 
@@ -59,6 +61,8 @@ beike auth <YOUR_API_KEY> --save
 - [beike-market - 市场行情查询](./beike-market/SKILL.md)
 - [beike-policy - 购房政策顾问](./beike-policy/SKILL.md)
 - [beike-school - 学区查询](./beike-school/SKILL.md)
+- [beike-sell - 卖房业主助手](./beike-sell/SKILL.md)
+- [beike-decor - 装修助手](./beike-decor/SKILL.md)
 
 ## 许可
 

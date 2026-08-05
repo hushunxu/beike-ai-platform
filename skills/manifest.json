@@ -40,6 +40,22 @@
       "archiveName": "beike-school-skill",
       "url": "https://github.com/hushunxu/beike-ai-platform/releases/download/skills-2026.08.04/beike-school-skill-0.1.1.zip",
       "sha256": "53a94a2e4300b395b348d990978f37a623ace58aa81aa06d9857e940c952a821"
+    },
+    {
+      "name": "beike-sell",
+      "displayName": "贝壳卖房助手",
+      "version": "0.1.0",
+      "archiveName": "beike-sell-skill",
+      "url": "https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/dist/beike-sell-skill-0.1.0.zip",
+      "sha256": "707a0f790d143c6dd74742dc3ecbbe39285b0140115152caf02d89d711632f3b"
+    },
+    {
+      "name": "beike-decor",
+      "displayName": "贝壳装修助手",
+      "version": "0.1.0",
+      "archiveName": "beike-decor-skill",
+      "url": "https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/dist/beike-decor-skill-0.1.0.zip",
+      "sha256": "0e09a9897fe19cdc3d204293e96d8fb3a75b435649ae6e9f13cc2f85b2831ec0"
     }
   ]
 }
