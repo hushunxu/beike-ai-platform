@@ -64,6 +64,36 @@ beike auth <YOUR_API_KEY> --save
 - [beike-sell - 卖房业主助手](./beike-sell/SKILL.md)
 - [beike-decor - 装修助手](./beike-decor/SKILL.md)
 
+## Skill 开发与发布
+
+本目录是 Skill 的唯一源码，不需要再同步到其他仓库。
+
+修改某个 Skill 时，同时编辑其 `SKILL.md` 和 `manifest.json`。只要内容变化，就必须提升该 Skill 自己的 `version`，然后提交源码：
+
+```bash
+git add skills/beike-buy/
+git commit -m "feat: update beike-buy skill"
+```
+
+本地构建并校验全部 Skill：
+
+```bash
+./scripts/build-skills.sh
+./scripts/test-skills.sh
+```
+
+产物生成在被 Git 忽略的 `.build/skills/`，不会修改已发布文件。
+
+发布所有“版本号已变化”的 Skill：
+
+```bash
+./scripts/build-skills.sh --release
+```
+
+发布前要求本仓库处于干净、与远端一致的 `main`。脚本会为每个 Skill 创建不可覆盖的 `<skill>-v<version>` GitHub Release，上传 ZIP 和校验文件，更新 `skills/manifest.json`，最后提交并推送该清单。
+
+Skill 与 CLI 独立发版；修改 Skill 不需要重新编译 CLI。
+
 ## 许可
 
 贝壳内部使用。

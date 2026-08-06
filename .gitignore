@@ -1,7 +1,4 @@
+.build/
 skills/dist/*.zip
 skills/dist/*.zip.sha256
-!skills/dist/beike-sell-skill-*.zip
-!skills/dist/beike-sell-skill-*.zip.sha256
-!skills/dist/beike-decor-skill-*.zip
-!skills/dist/beike-decor-skill-*.zip.sha256
 .idea/

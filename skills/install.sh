@@ -166,7 +166,7 @@ main() {
     TMP_DIR="$(mktemp -d -t beike-skills-install.XXXXXX)"
     trap cleanup EXIT INT TERM
 
-    require_cmd tar
+    require_cmd unzip
     require_cmd python3
 
     echo "==> 获取 Skill 清单..."
@@ -202,6 +202,9 @@ except Exception as e:
 
     # 对每个 skill 进行安装
     for skill_name in "${requested_skills[@]}"; do
+        if [[ ! "$skill_name" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
+            fatal_error "Skill 名称不合法: $skill_name"
+        fi
         echo "==> 安装 $skill_name..."
 
         # 从 manifest 中查找该 skill 的信息
@@ -255,7 +258,7 @@ with open('$skill_dir/manifest.json') as f:
             fi
         fi
 
-        local archive_file="$TMP_DIR/$skill_name.tar.gz"
+        local archive_file="$TMP_DIR/$skill_name.zip"
         echo "  下载中..."
         if ! download "$url" "$archive_file"; then
             fatal_error "下载 $skill_name 失败" "URL: $url"
@@ -265,23 +268,26 @@ with open('$skill_dir/manifest.json') as f:
         file_size=$(wc -c <"$archive_file" 2>/dev/null || echo "0")
         [[ "$file_size" -lt 1024 ]] && fatal_error "下载文件过小，可能已损坏"
 
-        # 校验 sha256
-        if [[ -n "$checksum" ]]; then
-            echo "  校验完整性..."
-            local actual=""
-            if command -v shasum >/dev/null 2>&1; then
-                actual=$(shasum -a 256 "$archive_file" | cut -d' ' -f1)
-            elif command -v sha256sum >/dev/null 2>&1; then
-                actual=$(sha256sum "$archive_file" | cut -d' ' -f1)
-            fi
-            if [[ -n "$actual" && "$actual" != "$checksum" ]]; then
-                fatal_error "校验失败"
-            fi
+        # 校验 sha256；发布清单不允许省略完整性校验。
+        if [[ ! "$checksum" =~ ^[0-9a-f]{64}$ ]]; then
+            fatal_error "$skill_name 的 manifest 缺少有效 sha256"
+        fi
+        echo "  校验完整性..."
+        local actual=""
+        if command -v shasum >/dev/null 2>&1; then
+            actual=$(shasum -a 256 "$archive_file" | cut -d' ' -f1)
+        elif command -v sha256sum >/dev/null 2>&1; then
+            actual=$(sha256sum "$archive_file" | cut -d' ' -f1)
+        else
+            fatal_error "系统缺少 SHA-256 校验命令"
+        fi
+        if [[ "$actual" != "$checksum" ]]; then
+            fatal_error "校验失败"
         fi
 
         echo "  解压中..."
         mkdir -p "$skill_dir"
-        tar -xzf "$archive_file" -C "$skill_dir" || fatal_error "解压失败"
+        unzip -oq "$archive_file" -d "$skill_dir" || fatal_error "解压失败"
 
         # 检查必需文件
         if [[ ! -f "$skill_dir/$skill_name/SKILL.md" ]]; then
