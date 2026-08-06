@@ -290,13 +290,9 @@ with open('$skill_dir/manifest.json') as f:
         unzip -oq "$archive_file" -d "$skill_dir" || fatal_error "解压失败"
 
         # 检查必需文件
-        if [[ ! -f "$skill_dir/$skill_name/SKILL.md" ]]; then
+        if [[ ! -f "$skill_dir/SKILL.md" ]]; then
             fatal_error "压缩包格式错误（缺少 SKILL.md）"
         fi
-
-        # 将文件挪到 skill_dir 根目录
-        mv "$skill_dir/$skill_name"/* "$skill_dir/" 2>/dev/null || true
-        rmdir "$skill_dir/$skill_name" 2>/dev/null || true
 
         echo "  ✓ 安装成功"
         echo ""
