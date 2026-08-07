@@ -1,6 +1,24 @@
 {
-  "latest": "0.2.11",
+  "latest": "0.2.12",
   "releases": [
+    {
+      "version": "0.2.12",
+      "released_at": "2026-08-07T10:10:39Z",
+      "binaries": [
+        {
+          "os": "darwin",
+          "arch": "arm64",
+          "url": "https://github.com/hushunxu/beike-ai-platform/releases/download/v0.2.12/beike-darwin-arm64-0.2.12.tar.gz",
+          "sha256": "bafb4c66385298223ead7af858bad721aa122c7a71b71fc5a060da7fc5fe59bf"
+        },
+        {
+          "os": "darwin",
+          "arch": "amd64",
+          "url": "https://github.com/hushunxu/beike-ai-platform/releases/download/v0.2.12/beike-darwin-x64-0.2.12.tar.gz",
+          "sha256": "6634d5d56165b0539b18596b9f628b70c39dd74ab4753e0cc0d19a674bbe7057"
+        }
+      ]
+    },
     {
       "version": "0.2.11",
       "released_at": "2026-08-06T02:11:54Z",
