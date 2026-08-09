@@ -1,5 +1,5 @@
 {
-  "latest": "0.1.1",
+  "latest": "0.1.2",
   "skills": [
     {
       "name": "beike-buy",
@@ -69,7 +69,7 @@
       "version": "0.1.2",
       "archiveName": "beike-assistant-skill",
       "url": "https://github.com/hushunxu/beike-ai-platform/releases/download/skills-2026.08.09/beike-assistant-skill-0.1.2.zip",
-      "sha256": "280a45cd8feebae5e0e68bb957e47a199f3af3adb33855da8b9a29becbd3fe32"
+      "sha256": "3fe20ae957686f26fe7a5bae57d318dc3cd4801b53ec321a6ac2df7dbdd27914"
     }
   ]
 }
