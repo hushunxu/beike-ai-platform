@@ -177,13 +177,14 @@ main() {
 
     # 如果未指定 skill，则安装全部
     if [[ ${#requested_skills[@]} -eq 0 ]]; then
-        echo "==> 未指定 skill，将安装全部"
+        echo "==> 未指定 skill，默认安装全部业务 skill（beike-assistant 为聚合版，需单独安装）"
         requested_skills=($(python3 -c "
 import json, sys
 try:
     with open('$manifest_file') as f:
         m = json.load(f)
-        print(' '.join([s['name'] for s in m.get('skills', [])]))
+        # 聚合版 beike-assistant 已包含全部业务 skill，默认安装时排除，避免重复加载冲突
+        print(' '.join([s['name'] for s in m.get('skills', []) if s['name'] != 'beike-assistant']))
 except Exception as e:
     print('', file=sys.stderr)
     sys.exit(1)
@@ -192,6 +193,11 @@ except Exception as e:
         if [[ ${#requested_skills[@]} -eq 0 ]]; then
             fatal_error "manifest 中没有 skill 或格式错误"
         fi
+    fi
+
+    # 防冲突：beike-assistant 只能单独安装，不能与其他业务 skill 同时安装
+    if [[ " ${requested_skills[*]} " == *" beike-assistant "* ]] && [[ ${#requested_skills[@]} -gt 1 ]]; then
+        fatal_error "beike-assistant 是聚合版（已包含全部业务 skill），请单独安装：install.sh | bash -s -- beike-assistant"
     fi
 
     echo "==> 计划安装: ${requested_skills[*]}"
