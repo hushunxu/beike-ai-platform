@@ -52,30 +52,20 @@ while [[ $# -gt 0 ]]; do
 done
 
 detect_skills_dir() {
+    # 优先级：显式参数 > 环境变量（精确识别当前 agent）> 中性默认值
+    # 不做目录存在性探测，避免多个 agent 共存时互相干扰
     if [[ -n "$SKILLS_DIR_EXPLICIT" ]]; then
         printf '%s\n' "$SKILLS_DIR_EXPLICIT"
     elif [[ -n "${WORKBUDDY_HOME:-}" ]]; then
         printf '%s/skills\n' "${WORKBUDDY_HOME%/}"
+    elif [[ -n "${HERMES_HOME:-}" ]]; then
+        printf '%s/skills\n' "${HERMES_HOME%/}"
+    elif [[ -n "${OPENCLAW_HOME:-}" ]]; then
+        printf '%s/skills\n' "${OPENCLAW_HOME%/}"
     elif [[ -n "${CODEX_THREAD_ID:-}" ]]; then
         printf '%s/.codex/skills\n' "$HOME"
     elif [[ -n "${CLAUDE_CODE:-}${CLAUDECODE:-}" ]]; then
         printf '%s/.claude/skills\n' "$HOME"
-    elif [[ -n "${OPENCLAW_HOME:-}" ]]; then
-        printf '%s/skills\n' "${OPENCLAW_HOME%/}"
-    elif [[ -n "${HERMES_HOME:-}" ]]; then
-        printf '%s/skills\n' "${HERMES_HOME%/}"
-    elif [[ "$PWD" == "$HOME/WorkBuddy" || "$PWD" == "$HOME/WorkBuddy/"* ]]; then
-        printf '%s/.workbuddy/skills\n' "$HOME"
-    elif [[ -d "$HOME/.workbuddy" ]]; then
-        printf '%s/.workbuddy/skills\n' "$HOME"
-    elif [[ -d "$HOME/.claude" ]]; then
-        printf '%s/.claude/skills\n' "$HOME"
-    elif [[ -d "$HOME/.codex" ]]; then
-        printf '%s/.codex/skills\n' "$HOME"
-    elif [[ -d "$HOME/.openclaw" ]]; then
-        printf '%s/.openclaw/skills\n' "$HOME"
-    elif [[ -d "$HOME/.hermes" ]]; then
-        printf '%s/.hermes/skills\n' "$HOME"
     else
         printf '%s/.agents/skills\n' "$HOME"
     fi
