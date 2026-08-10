@@ -13,6 +13,7 @@ SKILLS_DIR_EXPLICIT="${BEIKE_SKILLS_DIR:-}"
 BEIKE_SKILLS_DIR=""
 MANIFEST_URL="${BEIKE_MANIFEST_URL:-https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/manifest.json}"
 CLI_INSTALL_URL="${BEIKE_CLI_INSTALL_URL:-https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/cli/releases/install.sh}"
+CLI_INSTALL_PS1_URL="${BEIKE_CLI_INSTALL_PS1_URL:-https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/cli/releases/install.ps1}"
 SKIP_CLI=0
 
 usage() {
@@ -91,6 +92,13 @@ fatal_error() {
     exit 1
 }
 
+is_windows() {
+    case "$(uname -s)" in
+    *MINGW* | *MSYS* | *CYGWIN*) return 0 ;;
+    *) return 1 ;;
+    esac
+}
+
 download() {
     local url="$1" output="$2"
     local retries=3 n=0
@@ -140,7 +148,31 @@ install_cli() {
         echo "==> 未检测到 beike CLI，正在安装必要依赖..."
     fi
 
-    local cli_installer="$TMP_DIR/install-beike-cli.sh"
+    local cli_installer ps1_path win_beike
+
+    if is_windows; then
+        cli_installer="$TMP_DIR/install-beike-cli.ps1"
+        if ! download "$CLI_INSTALL_PS1_URL" "$cli_installer"; then
+            fatal_error "无法下载 beike CLI 安装脚本" "URL: $CLI_INSTALL_PS1_URL"
+        fi
+        ps1_path="$cli_installer"
+        command -v cygpath >/dev/null 2>&1 && ps1_path="$(cygpath -w "$cli_installer")"
+        if ! powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$ps1_path"; then
+            fatal_error "beike CLI 安装失败"
+        fi
+        if command -v cygpath >/dev/null 2>&1; then
+            win_beike="$(cygpath -u "${LOCALAPPDATA:-$HOME/AppData/Local}/beike/beike.exe")"
+        else
+            win_beike="${LOCALAPPDATA:-$HOME/AppData/Local}/beike/beike.exe"
+        fi
+        if [[ ! -f "$win_beike" ]]; then
+            fatal_error "beike CLI 安装完成，但未找到 $win_beike"
+        fi
+        echo "✓ beike CLI 已安装（请重新打开终端后执行 beike --version）"
+        return
+    fi
+
+    cli_installer="$TMP_DIR/install-beike-cli.sh"
     if ! download "$CLI_INSTALL_URL" "$cli_installer"; then
         fatal_error "无法下载 beike CLI 安装脚本" "URL: $CLI_INSTALL_URL"
     fi
@@ -314,7 +346,7 @@ with open('$skill_dir/manifest.json') as f:
     else
         echo "下一步：登录贝壳 AI 开放平台获取 API Key"
         echo "  http://preview-skill.ke.com/?action=get-key"
-        if command -v beike >/dev/null 2>&1; then
+        if command -v beike >/dev/null 2>&1 || is_windows; then
             echo ""
             echo "获取后保存："
             echo "  beike auth <YOUR_API_KEY> --save"

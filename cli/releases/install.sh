@@ -99,7 +99,8 @@ main() {
     local os_name
     os_name="$(uname -s | tr '[:upper:]' '[:lower:]')"
     if [[ "$os_name" == *"mingw"* || "$os_name" == *"cygwin"* || "$os_name" == *"msys"* ]]; then
-        echo "Windows 请使用 PowerShell 安装（暂不支持 Git Bash）" >&2
+        echo "Windows 请使用 PowerShell 安装（本脚本不支持 Git Bash）：" >&2
+        echo "  powershell -ExecutionPolicy Bypass -Command \"irm https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/cli/releases/install.ps1 | iex\"" >&2
         exit 1
     fi
 
