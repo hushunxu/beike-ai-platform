@@ -19,7 +19,7 @@ curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/cli
 
 ## 初始化
 
-首次使用前，先[登录贝壳 AI 开放平台获取 API Key](http://preview-skill.ke.com/?action=get-key)，再保存：
+首次使用前，先运行 `beike login` 打开登录页获取 API Key（链接自动携带当前平台来源），再保存：
 
 ```bash
 beike auth <YOUR_API_KEY> --save

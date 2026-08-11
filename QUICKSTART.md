@@ -6,7 +6,7 @@
 
 所有功能都需要 API Key。
 
-**打开浏览器获取：** http://preview-skill.ke.com/?action=get-key
+**打开登录页获取：** 安装 CLI 后运行 `beike login`（链接自动携带当前平台来源）。
 
 👉 [详细说明](./docs/authentication.md)
 

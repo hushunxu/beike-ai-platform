@@ -46,7 +46,7 @@ curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/ski
 curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/skills/install.sh | bash -s -- --no-cli beike-buy
 ```
 
-首次使用前，请[登录贝壳 AI 开放平台获取 API Key](http://preview-skill.ke.com/?action=get-key)，然后执行：
+首次使用前，先运行 `beike login` 打开登录页获取 API Key（链接自动携带当前平台来源），然后执行：
 
 ```bash
 beike auth <YOUR_API_KEY> --save

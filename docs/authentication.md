@@ -2,7 +2,7 @@
 
 ## 获取 API Key
 
-打开 [贝壳 AI 开放平台](http://preview-skill.ke.com/?action=get-key) 登录并获取 API Key。
+运行 `beike login` 打开登录页获取 API Key（链接自动携带当前平台来源）。
 
 ## 保存 API Key
 

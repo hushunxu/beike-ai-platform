@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # 贝壳 CLI 安装脚本（macOS / Linux）
-# curl -fsSL https://preview-skill.ke.com/install | bash
+# curl -fsSL https://raw.githubusercontent.com/hushunxu/beike-ai-platform/main/cli/releases/install.sh | bash
 if [ -z "${BASH_VERSION:-}" ]; then
     exec bash "$0" "$@"
 fi
@@ -186,8 +186,8 @@ main() {
     echo "运行以下命令开始使用："
     echo "  beike --help"
     echo ""
-    echo "下一步：登录贝壳 AI 开放平台获取 API Key"
-    echo "  http://preview-skill.ke.com/?action=get-key"
+    echo "下一步：运行 beike login 获取登录链接并打开获取 API Key"
+    echo "  beike login"
     echo ""
     echo "获取后保存："
     echo "  beike auth <YOUR_API_KEY> --save"
