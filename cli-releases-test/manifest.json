@@ -1,0 +1,7 @@
+{
+  "version": "0.2.24-test",
+  "platforms": {
+    "darwin-arm64": "darwin-arm64/beike_local",
+    "darwin-x64": "darwin-x64/beike_local"
+  }
+}
