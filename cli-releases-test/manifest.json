@@ -1,5 +1,5 @@
 {
-  "version": "0.2.30-test",
+  "version": "0.2.24-test",
   "platforms": {
     "darwin-arm64": "darwin-arm64/beike_local",
   }
