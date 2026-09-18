@@ -25,6 +25,9 @@ chmod +x "$TMP_FILE"
 if [[ "$(uname -s)" == "Darwin" ]]; then
   # 去掉 macOS 下载隔离，避免 Gatekeeper 拦截
   xattr -dr com.apple.quarantine "$TMP_FILE" 2>/dev/null || true
+  # 重新 ad-hoc 签名：跨机器/跨磁盘拷贝会让原有签名失效，
+  # 不重签会导致 macOS 首次执行时卡在 Gatekeeper 校验（长时间无响应）
+  codesign --force --sign - "$TMP_FILE" 2>/dev/null || true
 fi
 
 mv "$TMP_FILE" "$INSTALL_DIR/beike_local"
